@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+<label for="title">Title</label><br>
+<input type="txt" id="title"><br>
+<label for="isbn">ISBN</label><br>
+<input type="txt" id="isbn"><br>
+<label for="author">Author</label><br>
+<input type="txt" id="author"><br>
+<button onclick="add()">Add</button>
+<button onclick="search()">Search</button>
+<p>Searching works on all fields</p>
+<p id="container"></p>
+</body>
+
+<script>
+    function getBook() {
+        const title = document.getElementById("title").value;
+        const isbn = document.getElementById("isbn").value;
+        const author = document.getElementById("author").value;
+        return {title,isbn,author};
+    }
+
+    function createRequest(url,body) {
+        const xmlHttpRequest = new XMLHttpRequest();
+        xmlHttpRequest.open("POST",url)
+        xmlHttpRequest.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlHttpRequest.send(JSON.stringify(body));
+        return xmlHttpRequest;
+    }
+
+    function add() {
+        const book = getBook();
+        const xmlHttpRequest = createRequest("/add",book);
+        getResponse(xmlHttpRequest,showData(document.getElementById("container")));
+    }
+
+    function showData(htmlElement) {
+        return data=>{
+            htmlElement.innerText = data;
+        }
+    }
+
+    function getResponse(xmlHttpRequest,callback) {
+        xmlHttpRequest.onreadystatechange = function () {
+            if (xmlHttpRequest.readyState !== 4) return;
+            if (xmlHttpRequest.status === 200) {
+                callback(xmlHttpRequest.responseText);
+            }
+        };
+    }
+
+    function search() {
+        const book = getBook();
+        const xmlHttpRequest = createRequest("/search",book);
+        getResponse(xmlHttpRequest,showData(document.getElementById("container")));
+    }
+</script>
+</html>
